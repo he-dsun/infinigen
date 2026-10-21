@@ -1,0 +1,9 @@
+# Blender ground truth only: same as blender_gt.gin but skips the (slow) full RGB
+# rendershort pass. Useful when only the layered depth GT is needed, or when the RGB
+# render has to wait for a GPU build.
+#
+# The backup pass renders at 8192 spp (hours per frame on CPU), which is far too
+# expensive to trigger implicitly. Leave it out; a failed GT pass should fail loudly.
+iterate_scene_tasks.camera_dependent_tasks = [
+    {'name': 'blendergt', 'func': @ground_truth/queue_render},
+]

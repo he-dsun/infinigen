@@ -1,0 +1,4 @@
+# Scene generation only. The DFF pipeline renders its own focal stack and layered
+# depth GT, so skip the camera-dependent standard GT passes here. This also avoids
+# the blendergtbackup fallback, which renders at 8192 spp and can take hours.
+iterate_scene_tasks.camera_dependent_tasks = []

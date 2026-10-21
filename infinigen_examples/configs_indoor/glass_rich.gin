@@ -1,0 +1,26 @@
+# Glass-rich indoor scenes, for generating LayeredDepth-Syn style multi-layer depth
+# data: more of the image should end up behind a transparent surface.
+#
+# Pass this config AFTER the solve-budget config, e.g.
+#   python -m infinigen_examples.generate_indoors --seed 0 --task coarse \
+#       --output_folder outputs/glass_rich/coarse \
+#       -g fast_solve.gin singleroom.gin glass_rich.gin \
+#       -p compose_indoors.terrain_enabled=False compose_indoors.solve_steps_large=60 \
+#          compose_indoors.solve_steps_medium=40 compose_indoors.solve_steps_small=15
+#
+# What it turns on:
+#   home_asset_usage.glass_rich            -> every door is a glass-panel door, and
+#                                             glassware (wineglass/jar/bottle) is
+#                                             allowed in more small-object roles
+#   sample_home_constraint_params.glass_rich -> an aquarium tank is always in the
+#                                             constraint graph, with count 1-2
+# Note: glassware/aquariums only get placed if the solver has enough steps, so give
+# this config more than fast_solve's 20/10/5 (the shipped dataset uses 300/200/50).
+
+home_asset_usage.glass_rich = True
+sample_home_constraint_params.glass_rich = True
+random_door_factory.glass_rich = True
+
+# Glassware is mostly placed in the medium/small stages. Solve those objects before
+# camera selection so the selected views actually see the transparent content.
+compose_indoors.solve_objects_before_cameras = True

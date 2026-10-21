@@ -1,0 +1,4 @@
+# Build one room contour directly instead of searching a full room graph and
+# segmenting it. Pair this with:
+#   -p FloorPlanSolver.single_room_type=Bathroom
+FloorPlanSolver.single_room_fast_path = True

@@ -1,0 +1,46 @@
+# Defaults for Depth-From-Focus (DFF) focal stacks.
+#
+# Render a stack with:
+#   python -m infinigen_examples.generate_nature --seed 0 --task render \
+#       --input_folder outputs/<scene>/coarse --output_folder outputs/<scene>/frames \
+#       -g dff_stack.gin \
+#       -p render.render_image_func=@dff/render_focal_stack
+#
+# The stack keeps the camera pose and focal length fixed and varies the *focus distance*
+# (what "depth from focus" datasets call the focal stack). Focus planes are uniformly
+# spaced in 1/z (diopters) over the visible depth range, which is how defocus blur is
+# distributed; the chosen distances and the blur-per-plane are written to
+# focal_stack.json in the output folder.
+
+# 12 planes is the common range (10-15) in DFF datasets; more planes = smoother depth
+# sweep, more renders.
+dff/render_focal_stack.focus_count = 12
+
+# Wide aperture is what creates the blur signal. f/2.0 with a 35 mm lens gives several
+# pixels of defocus across an indoor room; f/8 would give almost none.
+dff/render_focal_stack.aperture_fstop = 2.0
+dff/render_focal_stack.aperture_blades = 6
+
+# The scene cameras are 15 mm (very wide, ~100 deg FOV). For DFF that produces <2 px of
+# blur, so default to 35 mm (~54 deg). Set to None to keep the scene's own lens.
+dff/render_focal_stack.focal_length_mm = 35.0
+
+# Focus-range planning: 2nd..98th percentile of visible depth, expanded by 10%.
+dff/render_focal_stack.depth_percentiles = (2.0, 98.0)
+dff/render_focal_stack.focus_margin = 0.1
+dff/render_focal_stack.focus_spacing = "diopters"
+
+# Prefer a different glass target for later camera rigs in the same scene.
+dff/render_focal_stack.aim_diversity = True
+dff/render_focal_stack.min_glass_objects = 1
+
+# Strict default adopted from the collaboration pipeline: reject any layer whose
+# five subpixel renders are incomplete or differ by more than 10 cm.
+dff/render_focal_stack.gt_shifted_camera_num = 5
+dff/render_focal_stack.gt_consistency_m = 0.1
+# `distinct` keeps the current glass-shell merge. Set False for official
+# raw path-bounce semantics.
+dff/render_focal_stack.merge_duplicate_glass_layers = True
+
+# RGB passes saved for every focus plane (the image itself is always saved).
+dff/render_focal_stack.passes_to_save = [['z', 'Depth']]
